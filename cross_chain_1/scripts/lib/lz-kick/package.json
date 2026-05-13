@@ -1,0 +1,9 @@
+{
+  "name": "lz-manual-kick",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "starknet": "7.5.0"
+  }
+}

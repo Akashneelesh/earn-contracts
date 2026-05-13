@@ -1,0 +1,7 @@
+# Override the local .gitignore for Vercel — we want config.js (with burner
+# keys) bundled into the deploy. Per user's explicit choice.
+!config.js
+
+node_modules/
+.DS_Store
+serve.sh

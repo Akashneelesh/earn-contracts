@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Transmission Console · ETH ⇄ Starknet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400..900,0..100,0..1;1,9..144,400..900,0..100,0..1&family=Schibsted+Grotesk:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+  />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header class="top-bar">
+    <div class="brand">
+      <span class="brand-bullet" aria-hidden="true">●</span>
+      <span class="brand-label">TRANSMISSION&nbsp;CONSOLE</span>
+    </div>
+    <div class="top-meta">
+      <span class="status" id="net-status">
+        <span class="status-dot"></span>
+        <span class="status-text">DETECTING</span>
+      </span>
+      <button type="button" class="privacy-toggle" id="privacy-toggle" aria-pressed="false">
+        <span class="privacy-toggle-label">PRIVACY</span>
+        <span class="privacy-toggle-state" id="privacy-toggle-state">OFF</span>
+      </button>
+      <span class="ver">SEPOLIA &middot; v0.4</span>
+    </div>
+  </header>
+
+  <main class="stage">
+
+    <section class="hero">
+      <div class="hero-from">
+        <p class="kicker">CHAIN&nbsp;A</p>
+        <h1 class="title"><em>Ethereum</em></h1>
+        <p class="hero-meta">
+          EID&nbsp;40161 &middot;
+          <span class="mono" id="eth-account">— burner —</span>
+        </p>
+      </div>
+
+      <div class="bridge" aria-hidden="true">
+        <div class="bridge-line"></div>
+        <div class="bridge-ticks">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="bridge-marker"></div>
+        <div class="bridge-arrows" aria-hidden="true">
+          <span class="ba-up">↑</span>
+          <span class="ba-dn">↓</span>
+        </div>
+      </div>
+
+      <div class="hero-to">
+        <p class="kicker">CHAIN&nbsp;B</p>
+        <h1 class="title"><em>Starknet</em></h1>
+        <p class="hero-meta">
+          EID&nbsp;40500 &middot;
+          <span class="mono" id="sn-account">— burner —</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- ------------------ TIER 2 PRIVACY PANEL (hidden unless PRIVACY=ON) ----- -->
+    <section class="tier2-panel" id="tier2-panel" hidden>
+      <header class="tier2-head">
+        <p class="section-num">00</p>
+        <h2 class="section-title">
+          <em>Tier&nbsp;2</em> private SN account
+          <span class="tier2-pill" id="tier2-stage-pill">setup</span>
+        </h2>
+        <p class="tier2-desc">
+          When PRIVACY is on, every SN&nbsp;→&nbsp;ETH press is signed by a
+          MetaMask-derived session key and submitted by Alice through the AVNU
+          paymaster + privacy pool. Your MetaMask address never touches Starknet.
+        </p>
+      </header>
+
+      <ol class="tier2-steps">
+        <li class="tier2-step" data-step="connect">
+          <span class="tier2-step-num">1</span>
+          <span class="tier2-step-label">Connect MetaMask</span>
+          <span class="tier2-step-val mono" id="tier2-mm-addr">—</span>
+          <button type="button" class="tier2-step-btn" id="tier2-connect-btn">CONNECT</button>
+        </li>
+        <li class="tier2-step" data-step="derive">
+          <span class="tier2-step-num">2</span>
+          <span class="tier2-step-label">Derive session key</span>
+          <span class="tier2-step-val mono" id="tier2-session-addr">—</span>
+          <button type="button" class="tier2-step-btn" id="tier2-derive-btn" disabled>DERIVE</button>
+        </li>
+        <li class="tier2-step" data-step="deploy">
+          <span class="tier2-step-num">3</span>
+          <span class="tier2-step-label">Deploy Tier-2 account</span>
+          <span class="tier2-step-val mono" id="tier2-account-addr">—</span>
+          <button type="button" class="tier2-step-btn" id="tier2-deploy-btn" disabled>DEPLOY</button>
+        </li>
+        <li class="tier2-step" data-step="fund">
+          <span class="tier2-step-num">4</span>
+          <span class="tier2-step-label">Fund Tier-2 with STRK</span>
+          <span class="tier2-step-val mono" id="tier2-strk-bal">—</span>
+          <button type="button" class="tier2-step-btn" id="tier2-refresh-bal-btn" disabled>REFRESH</button>
+        </li>
+      </ol>
+
+      <pre class="tier2-log" id="tier2-log" hidden></pre>
+    </section>
+
+    <!-- ------------------ TWO BUTTONS, SYMMETRIC ------------------ -->
+    <section class="dual">
+      <!-- LEFT: button on Ethereum increments Starknet -->
+      <article class="lane lane-eth">
+        <header class="lane-head">
+          <p class="section-num">01</p>
+          <h2 class="section-title">
+            From <em>Ethereum</em>
+            <span class="lane-arrow">→</span>
+            increment <em>Starknet</em>
+          </h2>
+        </header>
+
+        <div class="lane-controls">
+          <div class="amount-row" data-side="eth">
+            <button class="amount-chip" data-amount="1">−&nbsp;1</button>
+            <button class="amount-chip is-active" data-amount="5">−&nbsp;5</button>
+            <button class="amount-chip" data-amount="10">−&nbsp;10</button>
+            <button class="amount-chip" data-amount="42">−&nbsp;42</button>
+          </div>
+        </div>
+
+        <div class="button-wrap">
+          <button class="big-button" id="eth-press-btn" type="button" disabled>
+            <span class="big-button-label">
+              <span class="bb-row bb-top"><span class="bb-corner">+</span><span class="bb-corner">+</span></span>
+              <span class="bb-text">PRESS</span>
+              <span class="bb-sub" id="eth-bb-sub">arming…</span>
+              <span class="bb-row bb-bot"><span class="bb-corner">+</span><span class="bb-corner">+</span></span>
+            </span>
+            <span class="big-button-ring" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="lane-counter">
+          <p class="counter-label">Starknet&nbsp;count</p>
+          <div class="digits" id="sn-digits"></div>
+          <dl class="kv">
+            <dt>last</dt><dd class="mono" id="sn-last-by">—</dd>
+            <dt>from&nbsp;EID</dt><dd class="mono" id="sn-last-eid">—</dd>
+          </dl>
+        </div>
+      </article>
+
+      <!-- divider -->
+      <div class="lane-divider" aria-hidden="true">⇄</div>
+
+      <!-- RIGHT: button on Starknet increments Ethereum -->
+      <article class="lane lane-sn">
+        <header class="lane-head">
+          <p class="section-num">02</p>
+          <h2 class="section-title">
+            From <em>Starknet</em>
+            <span class="lane-arrow">→</span>
+            increment <em>Ethereum</em>
+          </h2>
+        </header>
+
+        <div class="lane-controls">
+          <div class="amount-row" data-side="sn">
+            <button class="amount-chip" data-amount="1">−&nbsp;1</button>
+            <button class="amount-chip is-active" data-amount="5">−&nbsp;5</button>
+            <button class="amount-chip" data-amount="10">−&nbsp;10</button>
+            <button class="amount-chip" data-amount="42">−&nbsp;42</button>
+          </div>
+        </div>
+
+        <div class="button-wrap">
+          <button class="big-button" id="sn-press-btn" type="button" disabled>
+            <span class="big-button-label">
+              <span class="bb-row bb-top"><span class="bb-corner">+</span><span class="bb-corner">+</span></span>
+              <span class="bb-text">PRESS</span>
+              <span class="bb-sub" id="sn-bb-sub">arming…</span>
+              <span class="bb-row bb-bot"><span class="bb-corner">+</span><span class="bb-corner">+</span></span>
+            </span>
+            <span class="big-button-ring" aria-hidden="true"></span>
+          </button>
+        </div>
+
+        <div class="lane-counter">
+          <p class="counter-label">Ethereum&nbsp;count</p>
+          <div class="digits" id="eth-digits"></div>
+          <dl class="kv">
+            <dt>last</dt><dd class="mono" id="eth-last-by">—</dd>
+            <dt>from&nbsp;EID</dt><dd class="mono" id="eth-last-eid">—</dd>
+          </dl>
+        </div>
+      </article>
+    </section>
+
+    <!-- ------------------ ABA — ROUND TRIP, ONE CLICK ------------------ -->
+    <section class="aba-zone">
+      <header class="aba-head">
+        <p class="section-num">03</p>
+        <h2 class="section-title">
+          One click. <em>Both</em> counters bounce.
+        </h2>
+        <p class="aba-desc">
+          Click <strong>BOUNCE</strong>. The message goes to Starknet, increments its
+          counter, and Starknet immediately sends a return message paying its own
+          STRK fee from a pre-funded balance — incrementing Ethereum's counter too.
+        </p>
+      </header>
+
+      <div class="aba-controls">
+        <label class="aba-input">
+          <span class="aba-input-label">Starknet&nbsp;+</span>
+          <input id="aba-by-sn" type="number" min="1" max="999" value="5" />
+        </label>
+        <label class="aba-input">
+          <span class="aba-input-label">Ethereum&nbsp;+</span>
+          <input id="aba-by-eth" type="number" min="1" max="999" value="3" />
+        </label>
+      </div>
+
+      <div class="aba-button-wrap">
+        <button class="aba-button" id="aba-press-btn" type="button" disabled>
+          <span class="aba-button-text">BOUNCE</span>
+          <span class="aba-button-sub" id="aba-bb-sub">arming…</span>
+        </button>
+      </div>
+
+      <div class="aba-counters">
+        <div class="aba-counter">
+          <p class="counter-label">Starknet&nbsp;count&nbsp;(v3)</p>
+          <div class="digits" id="aba-sn-digits"></div>
+        </div>
+        <div class="aba-counter">
+          <p class="counter-label">Ethereum&nbsp;count&nbsp;(v3)</p>
+          <div class="digits" id="aba-eth-digits"></div>
+        </div>
+      </div>
+
+      <div class="aba-status">
+        <p class="counter-label">Status</p>
+        <p class="mono" id="aba-status-text">idle</p>
+        <p class="mono small" id="aba-tx-link"></p>
+      </div>
+    </section>
+
+    <!-- ------------------ TRANSMISSION LOG ------------------ -->
+    <section class="log">
+      <header class="log-header">
+        <p class="section-num">03</p>
+        <h2 class="section-title">Transmission log</h2>
+        <div class="log-controls">
+          <span class="log-meta" id="log-meta">0 transmissions</span>
+          <button type="button" class="log-import-btn" id="log-import-btn" title="Pull historical messages from LayerZero scan">IMPORT HISTORY</button>
+          <button type="button" class="log-expand-btn" id="log-expand-btn" hidden>EXPAND</button>
+          <button type="button" class="log-clear-btn"  id="log-clear-btn"  hidden>CLEAR</button>
+        </div>
+      </header>
+      <ol class="log-list" id="log-list">
+        <li class="log-empty">No transmissions yet. Press a button.</li>
+      </ol>
+    </section>
+
+    <footer class="addresses">
+      <div class="addr-block">
+        <p class="kicker">ETH&nbsp;Trigger</p>
+        <p class="mono small selectable" id="addr-trigger">—</p>
+      </div>
+      <div class="addr-block">
+        <p class="kicker">SN&nbsp;Counter</p>
+        <p class="mono small selectable" id="addr-counter">—</p>
+      </div>
+      <div class="addr-block end">
+        <p class="kicker">Built&nbsp;with</p>
+        <p class="small">LayerZero V2 &middot; ethers v6 &middot; starknet.js v7</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module" src="./config.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

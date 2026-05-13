@@ -1,0 +1,9 @@
+{
+  "name": "starknet_oapp_deps",
+  "private": true,
+  "description": "Pulls LayerZero Starknet protocol packages so Scarb can resolve them via local paths.",
+  "version": "0.0.0",
+  "dependencies": {
+    "@layerzerolabs/protocol-starknet-v2": "latest"
+  }
+}

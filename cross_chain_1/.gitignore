@@ -1,0 +1,17 @@
+.env
+accounts.json
+snfoundry.toml
+**/out/
+**/cache/
+**/target/
+**/node_modules/
+**/lib/
+!scripts/lib/
+**/Scarb.lock
+broadcast/
+.DS_Store
+config.js
+.gstack/
+
+# Local Node deps for the LZ manual-delivery helper
+scripts/lib/lz-kick/node_modules/

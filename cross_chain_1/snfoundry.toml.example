@@ -1,0 +1,8 @@
+# Copy to snfoundry.toml after running scripts/01_setup_starknet_account.sh.
+# (The setup script auto-creates this file with your URL + account.)
+# This .example is here so you know what the real file should look like.
+
+[sncast.cross_chain_deployer]
+url = "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/YOUR_ALCHEMY_KEY"
+account = "account-1"
+accounts-file = "./accounts.json"

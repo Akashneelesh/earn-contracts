@@ -1,0 +1,40 @@
+[package]
+name = "starknet_oapp"
+edition = "2024_07"
+version = "0.1.0"
+
+[lib]
+
+[[target.starknet-contract]]
+sierra = true
+
+[dependencies]
+starknet = "2.14.0"
+# Pin OZ to the exact set the LayerZero protocol-starknet-v2 Scarb.lock uses.
+# Without exact pins the resolver picks openzeppelin_utils=2.1.0, which is incompatible
+# with openzeppelin_token-2.0.0's import paths.
+openzeppelin = "=2.0.0"
+openzeppelin_utils = "=2.0.0"
+openzeppelin_access = "=2.0.0"
+openzeppelin_token = "=2.0.0"
+openzeppelin_introspection = "=2.0.0"
+openzeppelin_security = "=2.0.0"
+openzeppelin_upgrades = "=2.0.0"
+openzeppelin_presets = "=2.0.0"
+openzeppelin_account = "=2.0.0"
+openzeppelin_finance = "=2.0.0"
+openzeppelin_governance = "=2.0.0"
+openzeppelin_merkle_tree = "=2.0.0"
+# LayerZero Starknet packages are vendored via npm (see package.json in this folder).
+# Run `npm install` here before `scarb build`.
+lz_utils = { path = "./node_modules/@layerzerolabs/protocol-starknet-v2/libs/lz_utils" }
+layerzero = { path = "./node_modules/@layerzerolabs/protocol-starknet-v2/layerzero" }
+
+[dev-dependencies]
+snforge_std = "0.60.0"
+
+[tool.scarb]
+allow-prebuilt-plugins = ["snforge_std", "snforge_scarb_plugin"]
+
+[scripts]
+test = "snforge test"
